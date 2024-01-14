@@ -1,59 +1,36 @@
 import PIL.Image
-import PIL.ImageColor
 import time
 import itertools
-import numpy
-import io
 import os.path, pathlib
 
-PixelList = ((itertools.product(range(256), range(256), range(256))))
-#((0,0,0), (0,0,255), (0,255,0), (255,0,0), (255,255,255))
-Count = 0
-xCount = 0
-def Generator():
-    global Count, xCount
+def _Generator():
+    xCount = 0
+    PixelList = ((itertools.product(range(256), range(256), range(256))))
     for x in (PixelList):
         xCount += 1
         yield x
-    Count += 1
     print(xCount)
     yield True
 
-def CreateImage(size=4096):
-    #size should be above 4096
+def CreateImage(PixelGen, size=4096) -> PIL.Image.Image:
+    #size should be above or equal to 4096 but under ...
     im = PIL.Image.new("RGB", (size, size))
     PixelMap = im.load()
-    g = Generator()
     for x in range(40000):
         for y in range(size):
-            Pixel = next(g)
+            Pixel = next(PixelGen)
             if Pixel == True:
-                im.show()
-                im.save(pathlib.Path(f"{os.path.dirname(__file__)}/EveryPixelImage.png"))
                 print("Done!")
-                return
+                return im
             try: PixelMap[x, y] = Pixel
             except: 
                 print("error but...")
-                im.show("EveryPixel.jpg")
-                return
+                return im
 
 start = time.perf_counter()
-CreateImage()
+for x in range(4120, 4151):
+    Image = CreateImage(_Generator(), x)
+    Image.save(pathlib.Path(f"{os.path.dirname(__file__)}/EveryPixelImage{x}.png"))
 print(time.perf_counter()-start)
 print(time.process_time())
 print(time.thread_time())
-exit()
-start = time.perf_counter()
-
-ImageWidth = ImageHeight = 10_000
-Detail = 1000
-
-x1 = y1 = .25
-x2 = y2 = .5
-
-PIL.Image.effect_mandelbrot((ImageWidth, ImageHeight), (x1, y1, x2, y2), Detail).show()
-
-print(time.process_time())
-print(time.thread_time())
-print(time.perf_counter()-start)
