@@ -1,7 +1,7 @@
 import PIL.Image
 import time
 import itertools
-import os.path, pathlib
+import os, os.path, pathlib
 
 def Generator(Repeat:int=3):
     #xCount = 0
@@ -68,15 +68,16 @@ if __name__ == "__main__":
     Bit24Image.save(Bit24ImageLocation)
     print(f"Image saved. ({Bit24ImageLocation})")
     ##NOTE: **Generating 32 bit is VERY SLOW! The resulting image is also very large, around 16MB.**
-    #Bit24Image = CreateImage(Generator(Repeat=4), 4096) 
-    #Bit24Image.save(pathlib.Path(f"{os.path.dirname(__file__)}/Every32bitPixel.png"))
-    print("Generating one colored images")
+    #Bit32Image = CreateImage(Generator(Repeat=4), 4096) 
+    #Bit32Image.save(pathlib.Path(f"{os.path.dirname(__file__)}/Every32bitPixel.png"))
+    print("Generating one colored images...")
     AllImages256 = [CreateImage(OneColorGen("r"), 16), CreateImage(OneColorGen("g"), 16), CreateImage(OneColorGen("b"), 16), CreateImage(OneColorGen(""), 16)]
     for Index, x in enumerate(AllImages256):
-        x.save(pathlib.Path(f"{os.path.dirname(__file__)}/Pixel{Index+1}.png"))
+        x.save(pathlib.Path(f"{os.path.dirname(__file__)}/OneColor{Index+1}.png"))
     print("Images generated. Creating gif...")
-    AllImages256[-1].save(pathlib.Path(f"{os.path.dirname(__file__)}/OneColorGif.gif"), append_images=AllImages256[::-1][:-1], save_all=True, loop=0, duration=len(AllImages256)/1000)
-    print("Gif created")
+    Image256Location = pathlib.Path(f"{os.path.dirname(__file__)}/OneColorGif.gif")
+    AllImages256[-1].save(Image256Location, append_images=AllImages256[::-1][:-1], save_all=True, loop=0, duration=len(AllImages256)/1000)
+    print(f"Gif created. ({Image256Location})")
     AllImagesTwoColor: list[PIL.Image.Image] = []
     for TwoColors in itertools.combinations_with_replacement("rgb", 2):
         TwoColors = "".join(TwoColors)
@@ -84,7 +85,7 @@ if __name__ == "__main__":
         AllImagesTwoColor.append(CreateImage(TwoColorGen(TwoColors), int((256**3)**.5)))
     for Index, Image in enumerate(AllImagesTwoColor):
         Image.save(pathlib.Path(f"{os.path.dirname(__file__)}/TwoColor{Index+1}.png"))
-    AllImagesTwoColor[-1].save(pathlib.Path(f"{os.path.dirname(__file__)}/OneColorGif.gif"), append_images=AllImagesTwoColor[::-1][:-1], save_all=True, loop=0, duration=len(AllImagesTwoColor)/1000)
+    AllImagesTwoColor[-1].save(pathlib.Path(f"{os.path.dirname(__file__)}/TwoColorGif.gif"), append_images=AllImagesTwoColor[::-1][:-1], save_all=True, loop=0, duration=len(AllImagesTwoColor)/1000)
     print(time.perf_counter()-start)
     print(time.process_time())
     print(time.thread_time())
